@@ -22,3 +22,6 @@ public class Address {
         this.zipcode = zipcode;
     }
 }
+
+// 값 타입은 변경 불가능하게 설계해야한다.
+// Embeddable 은 기본 생성자를 public or protected 로 설정.
