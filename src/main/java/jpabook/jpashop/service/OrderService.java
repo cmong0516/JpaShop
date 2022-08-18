@@ -32,6 +32,7 @@ public class OrderService {
         Order order = Order.createOrder(member, delivery, orderItem);
 
         orderRepository.save(order);
+        // cascadeAll 때문에 order 만 저장하면 다른것도 저장됨.
         return order.getId();
     }
 
