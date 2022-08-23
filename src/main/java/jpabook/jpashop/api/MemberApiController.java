@@ -21,6 +21,18 @@ public class MemberApiController {
         Long id = memberService.join(member);
         return new CreateMemberResponse(id);
     }
+    // class 를 만들지 않아도 된다.
+    // entity 가 바뀌면 api 스펙이 바뀐다.
+
+    @PostMapping("/api/v2/members")
+    public CreateMemberResponse saveMemberV2(@RequestBody @Valid CreateMemberRequest request) {
+        Member member = new Member();
+        member.setName(request.getName());
+        Long id = memberService.join(member);
+
+        return new CreateMemberResponse(id);
+    }
+    // entity 변경사항을 컨트롤러 에서 맞게 변경해주면 api 스펙은 바뀌지 않는다.
 
     @Data
     static class CreateMemberResponse {
@@ -30,5 +42,11 @@ public class MemberApiController {
             this.id = id;
         }
     }
+
+    @Data
+    static class CreateMemberRequest {
+        private String name;
+    }
+
 
 }
