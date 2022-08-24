@@ -5,9 +5,10 @@ import jpabook.jpashop.domain.Order;
 import jpabook.jpashop.domain.OrderSearch;
 import jpabook.jpashop.domain.OrderStatus;
 import jpabook.jpashop.repository.OrderRepository;
+import jpabook.jpashop.repository.simplequery.OrderSimpleQueryDto;
+import jpabook.jpashop.repository.simplequery.OrderSimpleQueryRepository;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.weaver.ast.Or;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 public class OrderSimpleApiController {
 
     private final OrderRepository orderRepository;
+    private final OrderSimpleQueryRepository orderSimpleQueryRepository;
 
     @GetMapping("/api/v1/simple-orders")
     public List<Order> orderV1() {
@@ -52,6 +54,14 @@ public class OrderSimpleApiController {
         return orderRepository.findAllWithMemberDelivery().stream().map(SimpleOrderDto::new).collect(Collectors.toList());
         // "select o FROM  Order o join fetch o.member m join fetch o.delivery d" sql 문제 join fetch 로 member, delivery 값을 한번에 가져온다.
         // 쿼리 한번으로 해결!
+    }
+
+    @GetMapping("/api/v4/simple-orders")
+    public List<OrderSimpleQueryDto> ordersV4() {
+        return orderSimpleQueryRepository.findOrderDtos();
+        // 일반적인 SQL 처럼 원하는 값을 선택 조회
+        // JPQL 을 DTO 로 바로 변환
+        // DB 네트웤 최적화 하지만 효과가 크진 않으며 repository 재사용성이 떨어진다.
     }
 
     @Data
