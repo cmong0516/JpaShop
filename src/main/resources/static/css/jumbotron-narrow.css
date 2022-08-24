@@ -32,11 +32,11 @@ body {
     border-top: 1px solid #e5e5e5;
 }
 
+
 /* Customize container */
 @media (min-width: 768px) {
     .container {
-        max-width: 730px;
-        padding: 14px 24px;
+        padding: 14px 20px;
     }
 
     /* Supporting marketing content */
