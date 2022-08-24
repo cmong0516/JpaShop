@@ -5,6 +5,7 @@ import jpabook.jpashop.repository.OrderRepository;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
@@ -42,7 +43,20 @@ public class OrderApiController {
         // 상품은 2개 인데 order 와 조인하면서 같은 order 가 두개씩 총 네개의 데이터가 나온다.
         // "select distinct o from Order o join fetch o.member m join fetch o.delivery d join fetch o.orderItems oi join fetch oi.item i"
         // distinct 는 DB 에서는 모든 항복이 같아야 중복 제거가 되지만 jpa 에선 id 값으로 판별해서 중복을 제거해준다.
-        // 단점 : 페이징 처리를 하기 힘들다.
+        // 단점 : 컬렉션은 일대다 조인이 발생하므로 데이터가 예측할수 없게 증가하여 페이징 처리가 힘들다.
+        // 해결
+        // toOne 관계는 fetch join 한다. -> 데이터가 증가하지 않기때문에 사용해도 무방함.
+        // 컬렉션은 모두 지연로딩으로 조회한다.
+    }
+
+    @GetMapping("/api/v3.1/orders")
+    public List<OrderDto> orderV3_page(
+            @RequestParam(value = "offset",defaultValue = "0") int offset,
+            @RequestParam(value = "limit",defaultValue = "100") int limit
+    ) {
+        //return orderRepository.findAllWithItem().stream().map(OrderDto::new).collect(Collectors.toList());
+        return orderRepository.findAllWithMemberDelivery(offset,limit).stream().map(OrderDto::new).collect(Collectors.toList());
+        // n+1 발생.
     }
 
     @Data
