@@ -2,6 +2,8 @@ package jpabook.jpashop.api;
 
 import jpabook.jpashop.domain.*;
 import jpabook.jpashop.repository.OrderRepository;
+import jpabook.jpashop.repository.query.OrderQueryDto;
+import jpabook.jpashop.repository.query.OrderQueryRepository;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +19,7 @@ import java.util.stream.Collectors;
 public class OrderApiController {
 
     private final OrderRepository orderRepository;
+    private final OrderQueryRepository orderQueryRepository;
 
 //    public List<Order> orderV1() {
 //        List<Order> all = orderRepository.findAllByString(new OrderSearch());
@@ -57,6 +60,18 @@ public class OrderApiController {
         //return orderRepository.findAllWithItem().stream().map(OrderDto::new).collect(Collectors.toList());
         return orderRepository.findAllWithMemberDelivery(offset,limit).stream().map(OrderDto::new).collect(Collectors.toList());
         // n+1 발생.
+        // spring.jpa.properties.hibernate.default_batch_fetch_size=100 옵션을 넣어주면
+        // n+1 을 1+1 로 최적화 해준다.
+    }
+
+    @GetMapping("/api/v4/orders")
+    public List<OrderQueryDto> ordersV4() {
+        return orderQueryRepository.findOrderQueryDto();
+    }
+
+    @GetMapping("/api/v5/orders")
+    public List<OrderQueryDto> ordersV5() {
+        return orderQueryRepository.findAllByDto_optimization();
     }
 
     @Data
@@ -67,7 +82,7 @@ public class OrderApiController {
         private LocalDateTime orderDate;
         private OrderStatus orderStatus;
         private Address address;
-//        private List<OrderItem> orderItems;
+        //        private List<OrderItem> orderItems;
         private List<OrderItemDto> orderItems;
 
         public OrderDto(Order order) {
