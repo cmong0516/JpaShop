@@ -46,7 +46,7 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
 }
 
-def querydslDir = 'src/main/generated'
+def querydslDir = "$buildDir/generated/querydsl"
 
 
 querydsl {
