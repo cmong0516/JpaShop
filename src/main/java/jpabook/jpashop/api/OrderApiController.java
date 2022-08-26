@@ -25,6 +25,7 @@ public class OrderApiController {
     private final OrderRepository orderRepository;
     private final OrderQueryRepository orderQueryRepository;
 
+    // Entity 반환
 //    public List<Order> orderV1() {
 //        List<Order> all = orderRepository.findAllByString(new OrderSearch());
 //        for (Order order : all) {
@@ -37,6 +38,7 @@ public class OrderApiController {
 //        // 지연로딩을 강제로 초기화 하고 Entity 를 반환하는 좋지않은 방법.
 //    }
 
+// Entity 조회후 Dto 로 반환
     @GetMapping("/api/v2/orders")
     public List<OrderDto> ordersV2() {
         return orderRepository.findAllByString(new OrderSearch()).stream().map(OrderDto::new).collect(toList());
@@ -44,6 +46,8 @@ public class OrderApiController {
         // join fetch 로 성능최적화를 하자.
     }
 
+    // Entity 조회후 Dto 반환
+    // join fetch 로 쿼리 최적화
     @GetMapping("/api/v3/orders")
     public List<OrderDto> ordersV3() {
         return orderRepository.findAllWithItem().stream().map(OrderDto::new).collect(toList());
@@ -56,6 +60,7 @@ public class OrderApiController {
         // 컬렉션은 모두 지연로딩으로 조회한다.
     }
 
+    // 컬렉션 페이징
     @GetMapping("/api/v3.1/orders")
     public List<OrderDto> orderV3_page(
             @RequestParam(value = "offset", defaultValue = "0") int offset,
@@ -68,16 +73,19 @@ public class OrderApiController {
         // n+1 을 1+1 로 최적화 해준다.
     }
 
+    // jpa 에서 dto 를 직접 조회
     @GetMapping("/api/v4/orders")
     public List<OrderQueryDto> ordersV4() {
         return orderQueryRepository.findOrderQueryDto();
     }
 
+    // map 과 in 을 사용하여 최적화
     @GetMapping("/api/v5/orders")
     public List<OrderQueryDto> ordersV5() {
         return orderQueryRepository.findAllByDto_optimization();
     }
 
+    // join 결과를 그대로 조회후 OrderFlatDto >> OrderQueryDto 로 변환.
     @GetMapping("/api/v6/orders")
     public List<OrderQueryDto> ordersV6() {
         List<OrderFlatDto> flats = orderQueryRepository.findAllByDto_flat();
@@ -88,7 +96,12 @@ public class OrderApiController {
 
     }
 
-    @Data
+    // 권장 순서
+    // 1. join fetch 로 최적화 V3
+    // 2. 컬렉션이 있을시 페이징 :  default batch fetch size 로 최적화    논페이징 : fetch join
+    // 3. entity 조회로 해결이 불가하면 DTO 를 직접 조회.     V4, V5, V6
+    // 4. DTO 조회로 해결이 불가하면 NativeSQL , jdbcTemplate
+   @Data
     static class OrderDto {
 
         private Long orderId;
