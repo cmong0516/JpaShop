@@ -103,8 +103,7 @@ public class OrderRepository {
                         nameLike(orderSearch.getMemberName()))
                 .limit(1000)
                 .fetch();
-
-
+        // 메서드로 if 문을 이용하여 return 값을 받아 넣을지 말지를 정해 동적쿼리를 만든다 ?
     }
 
     private BooleanExpression nameLike(String nameCond) {
